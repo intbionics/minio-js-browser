@@ -1,3 +1,6 @@
+## INTEGRATED BIONICS NOTE
+Using this repo for rtx_se plugin to allow public s3 access.  The latest version requires auth, public buckets not allowed.
+
 # DEPRECATION NOTICE
 
 **⚠️ This project has been discontinued**
