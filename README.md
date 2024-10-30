@@ -1,5 +1,5 @@
 ### INTEGRATED BIONICS NOTE
-Using this repo for rtx_se plugin to allow public s3 access.
+In use by rtx_se.
 
 # DEPRECATION NOTICE
 
