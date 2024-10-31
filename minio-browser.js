@@ -1829,9 +1829,14 @@ var Client = (function () {
 
       //Ensures Metadata has appropriate prefix for A3 API
       metaData = (0, _helpersJs.prependXAMZMeta)(metaData);
-      if (typeof stream === 'string' || stream instanceof Buffer) {
+        // ssmith not REQUIRED to use Buffer so we can pass arrayBuffer and uint8Arrays as well
+      //if (typeof stream === 'string' || stream instanceof Buffer) {
+        //// Adapts the non-stream interface into a stream.
+        //size = stream.length;
+        //stream = (0, _helpersJs.readableStream)(stream);
+      if (typeof stream === 'string' || stream instanceof Buffer || stream.length || stream.byteLength ) {
         // Adapts the non-stream interface into a stream.
-        size = stream.length;
+        size = stream.length || stream.byteLength;
         stream = (0, _helpersJs.readableStream)(stream);
       } else if (!(0, _helpersJs.isReadableStream)(stream)) {
         throw new TypeError('third argument should be of type "stream.Readable" or "Buffer" or "string"');
