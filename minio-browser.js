@@ -3530,6 +3530,7 @@ var ObjectUploader = (function (_Transform) {
           callback();
         });
 
+
         return;
       }
 
@@ -3586,6 +3587,8 @@ var ObjectUploader = (function (_Transform) {
       // Continue uploading various parts if we have initiated multipart upload.
       var partNumber = this.partNumber++;
 
+
+
       // Check to see if we've already uploaded this chunk. If the hash sums match,
       // we can skip to the next chunk.
       if (this.oldParts) {
@@ -3624,6 +3627,9 @@ var ObjectUploader = (function (_Transform) {
         var etag = response.headers.etag;
         if (etag) etag = etag.replace(/^"/, '').replace(/"$/, '');
 
+         // ssmith add callback with progress
+        _this.callback(null, null, (partNumber) / Math.ceil(chunk.length/_this.partSize));
+
         _this.etags.push({ part: partNumber, etag: etag });
 
         // We're ready for the next chunk.
@@ -3658,7 +3664,7 @@ var ObjectUploader = (function (_Transform) {
 
           // Give the etag back, we're done!
           process.nextTick(function () {
-            _this2.callback(null, etag);
+            _this2.callback(null, etag, 1); // ssmith add prog
           });
 
           // Because we're sure the stream has ended, allow it to flush and end.
@@ -3680,7 +3686,7 @@ var ObjectUploader = (function (_Transform) {
         // Call our callback on the next tick to allow the streams infrastructure
         // to finish what its doing before we continue.
         process.nextTick(function () {
-          _this2.callback(null, etag);
+          _this2.callback(null, etag, 1);  // ssmith add prog
         });
 
         callback();
