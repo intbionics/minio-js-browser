@@ -1160,6 +1160,8 @@ var Client = (function () {
           var authorization = (0, _signingJs.signV4)(reqOptions, _this2.accessKey, _this2.secretKey, region, date);
           reqOptions.headers.authorization = authorization;
         }
+          //ssmith request happens here
+          //console.log('reqOptions', reqOptions);
         var req = _this2.transport.request(reqOptions, function (response) {
           if (statusCode !== response.statusCode) {
             // For an incorrect region, S3 server always sends back 400.
@@ -1653,137 +1655,138 @@ var Client = (function () {
   }, {
     key: 'fPutObject',
     value: function fPutObject(bucketName, objectName, filePath, metaData, callback) {
-      var _this8 = this;
+      //var _this8 = this;
 
-      if (!(0, _helpersJs.isValidBucketName)(bucketName)) {
-        throw new errors.InvalidBucketNameError('Invalid bucket name: ' + bucketName);
-      }
-      if (!(0, _helpersJs.isValidObjectName)(objectName)) {
-        throw new errors.InvalidObjectNameError('Invalid object name: ' + objectName);
-      }
+      //if (!(0, _helpersJs.isValidBucketName)(bucketName)) {
+        //throw new errors.InvalidBucketNameError('Invalid bucket name: ' + bucketName);
+      //}
+      //if (!(0, _helpersJs.isValidObjectName)(objectName)) {
+        //throw new errors.InvalidObjectNameError('Invalid object name: ' + objectName);
+      //}
 
-      if (!(0, _helpersJs.isString)(filePath)) {
-        throw new TypeError('filePath should be of type "string"');
-      }
-      if ((0, _helpersJs.isFunction)(metaData)) {
-        callback = metaData;
-        metaData = {}; // Set metaData empty if no metaData provided.
-      }
-      if (!(0, _helpersJs.isObject)(metaData)) {
-        throw new TypeError('metaData should be of type "object"');
-      }
+      //if (!(0, _helpersJs.isString)(filePath)) {
+        //throw new TypeError('filePath should be of type "string"');
+      //}
+      //if ((0, _helpersJs.isFunction)(metaData)) {
+        //callback = metaData;
+        //metaData = {}; // Set metaData empty if no metaData provided.
+      //}
+      //if (!(0, _helpersJs.isObject)(metaData)) {
+        //throw new TypeError('metaData should be of type "object"');
+      //}
 
-      //Updates metaData to have the correct prefix if needed
-      metaData = (0, _helpersJs.prependXAMZMeta)(metaData);
-      var size;
-      var partSize;
+      ////Updates metaData to have the correct prefix if needed
+      //metaData = (0, _helpersJs.prependXAMZMeta)(metaData);
+      //var size;
+      //var partSize;
 
-      _async2['default'].waterfall([function (cb) {
-        return _fs2['default'].stat(filePath, cb);
-      }, function (stats, cb) {
-        size = stats.size;
-        if (size > _this8.maxObjectSize) {
-          return cb(new Error(filePath + ' size : ' + stats.size + ', max allowed size : 5TB'));
-        }
-        if (size < _this8.minimumPartSize) {
-          // simple PUT request, no multipart
-          var multipart = false;
-          var uploader = _this8.getUploader(bucketName, objectName, metaData, multipart);
-          var hash = transformers.getHashSummer(_this8.enableSHA256);
-          var start = 0;
-          var end = size - 1;
-          var autoClose = true;
-          if (size === 0) end = 0;
-          var options = { start: start, end: end, autoClose: autoClose };
-          (0, _helpersJs.pipesetup)(_fs2['default'].createReadStream(filePath, options), hash).on('data', function (data) {
-            var md5sum = data.md5sum;
-            var sha256sum = data.sha256sum;
-            var stream = _fs2['default'].createReadStream(filePath, options);
-            uploader(stream, size, sha256sum, md5sum, function (err, etag) {
-              callback(err, etag);
-              cb(true);
-            });
-          }).on('error', function (e) {
-            return cb(e);
-          });
-          return;
-        }
-        _this8.findUploadId(bucketName, objectName, cb);
-      }, function (uploadId, cb) {
-        // if there was a previous incomplete upload, fetch all its uploaded parts info
-        if (uploadId) return _this8.listParts(bucketName, objectName, uploadId, function (e, etags) {
-          return cb(e, uploadId, etags);
-        });
-        // there was no previous upload, initiate a new one
-        _this8.initiateNewMultipartUpload(bucketName, objectName, metaData, function (e, uploadId) {
-          return cb(e, uploadId, []);
-        });
-      }, function (uploadId, etags, cb) {
-        partSize = _this8.calculatePartSize(size);
-        var multipart = true;
-        var uploader = _this8.getUploader(bucketName, objectName, metaData, multipart);
+      //_async2['default'].waterfall([function (cb) {
+        //return _fs2['default'].stat(filePath, cb);
+      //}, function (stats, cb) {
+        //size = stats.size;
+        //if (size > _this8.maxObjectSize) {
+          //return cb(new Error(filePath + ' size : ' + stats.size + ', max allowed size : 5TB'));
+        //}
+        //if (size < _this8.minimumPartSize) {
+          //// simple PUT request, no multipart
+          //var multipart = false;
+          //var uploader = _this8.getUploader(bucketName, objectName, metaData, multipart);
+          //var hash = transformers.getHashSummer(_this8.enableSHA256);
+          //var start = 0;
+          //var end = size - 1;
+          //var autoClose = true;
+          //if (size === 0) end = 0;
+          //var options = { start: start, end: end, autoClose: autoClose };
+          //(0, _helpersJs.pipesetup)(_fs2['default'].createReadStream(filePath, options), hash).on('data', function (data) {
+            //var md5sum = data.md5sum;
+            //var sha256sum = data.sha256sum;
+            //var stream = _fs2['default'].createReadStream(filePath, options);
+            //uploader(stream, size, sha256sum, md5sum, function (err, etag) {
+              //callback(err, etag);
+              //cb(true);
+            //});
+          //}).on('error', function (e) {
+            //return cb(e);
+          //});
+          //return;
+        //}
+        //_this8.findUploadId(bucketName, objectName, cb);
+      //}, function (uploadId, cb) {
+        //// if there was a previous incomplete upload, fetch all its uploaded parts info
+        //if (uploadId) return _this8.listParts(bucketName, objectName, uploadId, function (e, etags) {
+          //return cb(e, uploadId, etags);
+        //});
+        //// there was no previous upload, initiate a new one
+        //_this8.initiateNewMultipartUpload(bucketName, objectName, metaData, function (e, uploadId) {
+          //return cb(e, uploadId, []);
+        //});
+      //}, function (uploadId, etags, cb) {
+        //partSize = _this8.calculatePartSize(size);
+        //var multipart = true;
+        //var uploader = _this8.getUploader(bucketName, objectName, metaData, multipart);
 
-        // convert array to object to make things easy
-        var parts = etags.reduce(function (acc, item) {
-          if (!acc[item.part]) {
-            acc[item.part] = item;
-          }
-          return acc;
-        }, {});
-        var partsDone = [];
-        var partNumber = 1;
-        var uploadedSize = 0;
-        _async2['default'].whilst(function () {
-          return uploadedSize < size;
-        }, function (cb) {
-          var part = parts[partNumber];
-          var hash = transformers.getHashSummer(_this8.enableSHA256);
-          var length = partSize;
-          if (length > size - uploadedSize) {
-            length = size - uploadedSize;
-          }
-          var start = uploadedSize;
-          var end = uploadedSize + length - 1;
-          var autoClose = true;
-          var options = { autoClose: autoClose, start: start, end: end };
-          // verify md5sum of each part
-          (0, _helpersJs.pipesetup)(_fs2['default'].createReadStream(filePath, options), hash).on('data', function (data) {
-            var md5sumHex = new Buffer(data.md5sum, 'base64').toString('hex');
-            if (part && md5sumHex === part.etag) {
-              //md5 matches, chunk already uploaded
-              partsDone.push({ part: partNumber, etag: part.etag });
-              partNumber++;
-              uploadedSize += length;
-              return cb();
-            }
-            // part is not uploaded yet, or md5 mismatch
-            var stream = _fs2['default'].createReadStream(filePath, options);
-            uploader(uploadId, partNumber, stream, length, data.sha256sum, data.md5sum, function (e, etag) {
-              if (e) return cb(e);
-              partsDone.push({ part: partNumber, etag: etag });
-              partNumber++;
-              uploadedSize += length;
-              return cb();
-            });
-          }).on('error', function (e) {
-            return cb(e);
-          });
-        }, function (e) {
-          if (e) return cb(e);
-          cb(null, partsDone, uploadId);
-        });
-      },
-      // all parts uploaded, complete the multipart upload
-      function (etags, uploadId, cb) {
-        return _this8.completeMultipartUpload(bucketName, objectName, uploadId, etags, cb);
-      }], function (err) {
-        for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          rest[_key - 1] = arguments[_key];
-        }
+        //// convert array to object to make things easy
+        //var parts = etags.reduce(function (acc, item) {
+          //if (!acc[item.part]) {
+            //acc[item.part] = item;
+          //}
+          //return acc;
+        //}, {});
+        //var partsDone = [];
+        //var partNumber = 1;
+        //var uploadedSize = 0;
+        //_async2['default'].whilst(function () {
+          //return uploadedSize < size;
+        //}, function (cb) {
+          //var part = parts[partNumber];
+          //var hash = transformers.getHashSummer(_this8.enableSHA256);
+          //var length = partSize;
+          //if (length > size - uploadedSize) {
+            //length = size - uploadedSize;
+          //}
+          //var start = uploadedSize;
+          //var end = uploadedSize + length - 1;
+          //var autoClose = true;
+          //var options = { autoClose: autoClose, start: start, end: end };
+          //// verify md5sum of each part
+          //(0, _helpersJs.pipesetup)(_fs2['default'].createReadStream(filePath, options), hash).on('data', function (data) {
+            //var md5sumHex = new Buffer(data.md5sum, 'base64').toString('hex');
+            //if (part && md5sumHex === part.etag) {
+              ////md5 matches, chunk already uploaded
+              //partsDone.push({ part: partNumber, etag: part.etag });
+              //partNumber++;
+              //uploadedSize += length;
+              //return cb();
+            //}
+            //// part is not uploaded yet, or md5 mismatch
+              //console.log('do stream/uploader');
+            //var stream = _fs2['default'].createReadStream(filePath, options);
+            //uploader(uploadId, partNumber, stream, length, data.sha256sum, data.md5sum, function (e, etag) {
+              //if (e) return cb(e);
+              //partsDone.push({ part: partNumber, etag: etag });
+              //partNumber++;
+              //uploadedSize += length;
+              //return cb();
+            //});
+          //}).on('error', function (e) {
+            //return cb(e);
+          //});
+        //}, function (e) {
+          //if (e) return cb(e);
+          //cb(null, partsDone, uploadId);
+        //});
+      //},
+      //// all parts uploaded, complete the multipart upload
+      //function (etags, uploadId, cb) {
+        //return _this8.completeMultipartUpload(bucketName, objectName, uploadId, etags, cb);
+      //}], function (err) {
+        //for (var _len = arguments.length, rest = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+          //rest[_key - 1] = arguments[_key];
+        //}
 
-        if (err === true) return;
-        callback.apply(undefined, [err].concat(rest));
-      });
+        //if (err === true) return;
+        //callback.apply(undefined, [err].concat(rest));
+      //});
     }
 
     // Uploads the object.
@@ -1827,6 +1830,10 @@ var Client = (function () {
         metaData = size;
       }
 
+        if(stream instanceof Uint8Array){
+            stream =  Buffer.from(stream)
+        }
+
       //Ensures Metadata has appropriate prefix for A3 API
       metaData = (0, _helpersJs.prependXAMZMeta)(metaData);
         // ssmith not REQUIRED to use Buffer so we can pass arrayBuffer and uint8Arrays as well
@@ -1854,16 +1861,22 @@ var Client = (function () {
       // largest block size possible if necessary.
       if (!(0, _helpersJs.isNumber)(size)) size = this.maxObjectSize;
 
+        let total_size = size; // ssmith  keep total size before overwriting it
       size = this.calculatePartSize(size);
 
       // s3 requires that all non-end chunks be at least `this.minimumPartSize`,
       // so we chunk the stream until we hit either that size or the end before
       // we flush it to s3.
+        // the chunker is -> function Block (size, opts)
       var chunker = (0, _blockStream22['default'])({ size: size, zeroPadding: false });
 
       // This is a Writable stream that can be written to in order to upload
       // to the specified bucket and object automatically.
       var uploader = new _objectUploader2['default'](this, bucketName, objectName, size, metaData, callback);
+        uploader.total_size = total_size; // ssmith add total size to uploader so we can use this in progress
+        uploader.bytes_uploaded = 0; // ssmith track bytes uploaded for progress
+        console.log('chunker', chunker);
+        console.log('uploader', uploader); // ObjectUploader
       // stream => chunker => uploader
       stream.pipe(chunker).pipe(uploader);
     }
@@ -3486,6 +3499,9 @@ var ObjectUploader = (function (_Transform) {
     value: function _transform(chunk, encoding, callback) {
       var _this = this;
 
+        //ssmith
+        //console.log('ObjectUploader','_transform',chunk);
+
       this.emptyStream = false;
       var method = 'PUT';
       var headers = Object.assign({}, this.metaData, { 'Content-Length': chunk.length });
@@ -3628,7 +3644,10 @@ var ObjectUploader = (function (_Transform) {
         if (etag) etag = etag.replace(/^"/, '').replace(/"$/, '');
 
          // ssmith add callback with progress
-        _this.callback(null, null, (partNumber) / Math.ceil(chunk.length/_this.partSize));
+          _this.bytes_uploaded += chunk.length;
+          let percent_prog = _this.bytes_uploaded / _this.total_size;
+          //console.log('partNumber', partNumber, 'bytes_uploaded so far', _this.bytes_uploaded, '%', percent_prog);
+        _this.callback(null, null, percent_prog);
 
         _this.etags.push({ part: partNumber, etag: etag });
 
@@ -7815,9 +7834,10 @@ var defined = require('defined');
 module.exports = Block;
 inherits(Block, Transform);
 
+
 function Block (size, opts) {
     if (!(this instanceof Block)) return new Block(size, opts);
-    Transform.call(this);
+    Transform.call(this); // Transform -> function Duplex(options) 
     if (!opts) opts = {};
     if (typeof size === 'object') {
         opts = size;
@@ -7839,7 +7859,9 @@ Block.prototype._transform = function (buf, enc, next) {
     while (this._bufferedBytes >= this.size) {
         var b = Buffer.concat(this._buffered);
         this._bufferedBytes -= this.size;
-        this.push(b.slice(0, this.size));
+        // ssmith, issue here with slice, was not actually slicing... updated Buffer.prototype.slice
+        let bout = b.slice(0, this.size);
+        this.push(bout);
         this._buffered = [ b.slice(this.size, b.length) ];
     }
     next();
@@ -14007,15 +14029,16 @@ Buffer.prototype.slice = function slice (start, end) {
   if (end < start) end = start
 
   var newBuf
-  if (Buffer.TYPED_ARRAY_SUPPORT) {
-    newBuf = Buffer._augment(this.subarray(start, end))
-  } else {
+    // ssmith  THE BUG!!! slice is broken with subarray, do it item by item copy
+  //if (Buffer.TYPED_ARRAY_SUPPORT) {
+    //newBuf = Buffer._augment(this.subarray(start, end))
+  //} else {
     var sliceLen = end - start
     newBuf = new Buffer(sliceLen, undefined)
     for (var i = 0; i < sliceLen; i++) {
       newBuf[i] = this[i + start]
     }
-  }
+  //}
 
   if (newBuf.length) newBuf.parent = this.parent || this
 
