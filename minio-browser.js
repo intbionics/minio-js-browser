@@ -3500,7 +3500,7 @@ var ObjectUploader = (function (_Transform) {
       var _this = this;
 
         //ssmith
-        //console.log('ObjectUploader','_transform',chunk);
+        console.log('ObjectUploader','_transform',chunk);
 
       this.emptyStream = false;
       var method = 'PUT';
@@ -3539,7 +3539,7 @@ var ObjectUploader = (function (_Transform) {
           // Give the etag back, we're done!
 
           process.nextTick(function () {
-            _this.callback(null, etag);
+            _this.callback(null, etag, 1); // ssmith add prog
           });
 
           // Because we're sure the stream has ended, allow it to flush and end.
@@ -3646,7 +3646,7 @@ var ObjectUploader = (function (_Transform) {
          // ssmith add callback with progress
           _this.bytes_uploaded += chunk.length;
           let percent_prog = _this.bytes_uploaded / _this.total_size;
-          //console.log('partNumber', partNumber, 'bytes_uploaded so far', _this.bytes_uploaded, '%', percent_prog);
+          console.log('partNumber', partNumber, 'bytes_uploaded so far', _this.bytes_uploaded, '%', percent_prog);
         _this.callback(null, null, percent_prog);
 
         _this.etags.push({ part: partNumber, etag: etag });
